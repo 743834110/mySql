@@ -1,0 +1,16 @@
+OBJS = mysql.tab.o IOUtil.o lex.o
+
+test: $(OBJS)
+	gcc -o test $(OBJS)
+	
+lex.o: IOUtil.h mysql.tab.h lex.h lex.c 
+	gcc -c lex.c
+			
+mysql.tab.c mysql.tab.h: mysql.y
+	bison -d mysql.y
+	
+IOUtil.o: IOUtil.h IOUtil.c
+	gcc -c IOUtil.c
+
+clean:
+	rm -r *.o test
