@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "lex.h"
 #include "mysql.tab.h"
+#include "IOUtil.h"
 #define BUFLEN 20
 
 Token token;
@@ -67,7 +68,24 @@ int yylex(){
 		ungetc(ch, stdin);  // 回退字符串到输入流中 
 		int sym = keyword_lookup(buf); 
 		token = sym == 0?newToken(buf,ID):newToken(buf,sym); 
-
+		//新加的面对ID被跳过的解决方案之一
+		if (sym == 0){
+			yylval.VALUE_STRING = strdup(buf);
+		}
+	}
+	//检测返回带“‘号内的内容
+	else if (ch == '"'){
+		while ((ch = getchar()) != '"' && ch != EOF && ch != ';' && ch != '\n')
+			*p++ = ch;
+		//正常结束时
+		if (ch == '"'){
+			*p = '\0';
+			token = newToken(buf, STR);
+		}
+		//非正常结束时:有下方的switch语句处理EOF(会产生错误)
+		else{
+			
+		}
 	}
 	else if (isdigit(ch)){
 		ungetc(ch, stdin); 
@@ -81,6 +99,7 @@ int yylex(){
 		//给token->integer赋值 
 		token->integer = integer;	
 	}
+
 	else	
 		switch(ch){
 			case '<':{
@@ -121,7 +140,7 @@ int yylex(){
 				token = newToken(strs, ch);
 			}
 		}
-
+	//printf("%d\n", token -> sym);
 	return token->sym;
 }
 

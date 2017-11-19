@@ -62,7 +62,7 @@ static void init_column(Field field){
 	field -> col_name = NULL;
 	field -> alias = NULL;
 	field -> data = NULL;
-	field -> type = STRING;
+	field -> type = INPUT_STRING;
 	field -> R = NULL;
 }
 //初始化表
@@ -80,6 +80,15 @@ static Value* new_node(char* _value){
 	node -> value = _value;
 	node -> next = NULL;
 	return node;
+}
+
+//遍历表结构
+static void ergodic_col (Table* table){
+	int i = 0;
+	for (; i < table -> col_num; i++) {
+		Field field = table -> fields[i];
+		printf("列%d:\t%s\n", i + 1 ,field -> col_name);
+	}
 }
 
 //填充数据
@@ -134,17 +143,52 @@ static int create_column(Table *table){
 void create_table(){
 	
 	init();	//载入config.ini,填充表名,打开文件,读取内容。
+	printf("共有%d张表:\n", _index);
 	for (int i = 0; i < _index; i++){
 		
 		tables[i] = (Table*)malloc(sizeof(*tables[i]));
 		init_table(tables[i], i);
 		setSource(table_files[i]);
-		printf("表名：%s\n", tables[i]->table_name);
+		printf("\t表名：%s\n", tables[i]->table_name);
 		create_column(tables[i]);
+		printf("\t\t构建%s表结构成功.\n", tables[i] -> table_name);
+		ergodic_col(tables[i]);
 		//开始填充数据表数据
 		fill_data(tables[i]);
-		
+		printf("\t\t填充%s表数据成功\n", tables[i] -> table_name);
 	}
+}
+
+//根据表名查找目标表名是否存在
+int isExistsTable(char* table_name){
+	int i = 0;
+	for (; i < _index; i++){
+		if (strcmp(table_name, tables[i] -> table_name) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+//检查列名是否已经存在或者存在多个相同的列名
+//0代表不存在相关列, 1代表只有一个相关列, 其余代表存在多个相关列
+int isExistsCol(char* table_name, char* col_name){
+	int index = 0, i;
+	for (i = 0; i < _index; i++) {
+		Table* table = tables[i];//得到其中一个表的指针
+		
+		if (strcmp(table_name, table -> table_name) != 0)
+			continue;
+		//printf("第%d张表的表名称为:%s\n", i, table -> table_name);
+		int j = 0;
+		// 遍历每一张表的
+		for (; j < table -> col_num; j++) {
+			Field field = table -> fields[j];
+			if (strcmp(col_name, field -> col_name) == 0)
+				index++;
+		}
+	}
+	//printf("比较情况:index = %d\n", index);
+	return index ;
 }
 
 //void main(){

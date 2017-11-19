@@ -29,19 +29,19 @@ stmts:
 	
 
 stmt:			'\n' 				{printf("mysql> ");}
-	|			stmt_select ';'		{find_all_data("");}
+	|			stmt_select ';'		{find_data("");}
 	|			error '\n'			{yyclearin;printf("mysql> ");}
 	;
 
 
-stmt_select:	SELECT sp columns sp FROM sp tables sp where_part 
+stmt_select:	SELECT sp columns sp FROM sp tables{col_tab_check();} sp where_part 
 	;
 
 sp://分隔符seperator	
 	|			sp '\n'	{printf("    -> ");};
 	;
 	
-columns:		'*'
+columns:		'*'		{field_push("*", 1, COL);}
 	|			_columns
 	;
 
@@ -49,21 +49,21 @@ _columns:		column col_alias_part
 	|			_columns ',' column	 col_alias_part
 	;
 
-column:			ID	{$1 = token -> ID;}
-	|			ID 		'.' ID	{$1 = token -> ID;}
+column:			ID	{field_push($1, 1, COL);}
+	|			ID 	{field_push($1, 1, TAB);} '.' ID {field_push(token -> ID, 0, NON);}
 	;
 
 col_alias_part:		
-	|			ID
-	|			AS ID
+	|			ID		{field_push(token -> ID, 0, ALIAS);}
+	|			AS ID	{field_push(token -> ID, 0, ALIAS);}
 	;
 
-tables:			table
-	|			tables ',' table
+tables:			table				
+	|			tables ',' table	
 	;
 	
-table:			ID
-	|			ID ID
+table:			ID {table_push($1, TAB);}
+	|			ID {table_push($1, TAB);} ID {table_push(token -> ID, ALIAS);}
 	;
 
 where_part:		
@@ -83,7 +83,7 @@ expr:			ID '=' value
 	;
 		
 
-value:			'"' ID '"'
+value:			STR
 	|			NUM
 	;
 

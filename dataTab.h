@@ -2,12 +2,12 @@
 #define DATATAB_H_
 
 enum Type{
-	INTEGER, STRING
+	INPUT_INTEGER, INPUT_STRING
 };
 
 typedef struct _Value{
 	char* value;
-	struct _value *next;
+	struct _Value *next;
 }Value;
 
 typedef struct _field{
@@ -28,5 +28,7 @@ typedef struct _table{
 }Table;
 
 void create_table();
+int isExistsTable(char* table_name);
+int isExistsCol(char* table_name,char* col_name);
 
 #endif
