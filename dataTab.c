@@ -8,10 +8,13 @@
 static char* config_file_path = "config/config.ini";
 static FILE* table_files[100];//表的所在文件路径指针。
 static char* table_name[100];//表名表
-static int _index = 0;//表的索引(size)
+int _index = 0;//表的索引(size)
 extern int LINENUM;//用于构建表
 Table *tables[100];//创建的表指针数组:将会被广泛使用
-
+//临时文件，存放select后的文本信息文件
+static char* temp_txt = "../temp.txt"; 
+static Table* temp_table = NULL;
+FILE* temp_file = NULL;
 
 
 //检查文件名,查看是否有重复表名
@@ -102,6 +105,7 @@ static void fill_data(Table *table){
 		while (LINENUM == i && hasNextChar()){
 		
 			Value* node = new_node(getString());
+			//printf("%s", node -> value);
 			Value* T = table -> fields[k] -> data;
 			Value* R;
 			if (T == NULL){
@@ -139,7 +143,6 @@ static int create_column(Table *table){
 		errExit("表结构期待在文本第一行出现");
 }
 
-
 void create_table(){
 	
 	init();	//载入config.ini,填充表名,打开文件,读取内容。
@@ -157,6 +160,66 @@ void create_table(){
 		fill_data(tables[i]);
 		printf("\t\t填充%s表数据成功\n", tables[i] -> table_name);
 	}
+}
+
+//将字符串输出到文本文件中
+void outputResultset(char* msg) {
+	if (temp_file == NULL)
+		temp_file = fopen(temp_txt, "w+");
+	if (temp_file == NULL)
+		printf("dfdfdf");
+	fprintf(temp_file, "%s\t", msg);
+}
+
+void newLine(){
+	if (temp_file == NULL)	
+		printf("临时文件尚未打开");
+	fprintf(temp_file,"\n");	
+}
+
+void close_file() {
+	if (temp_file == NULL)
+		printf("临时文件尚未打开");
+	fclose(temp_file);
+	temp_file = NULL;
+}
+
+//返回一张临时表
+Table* new_table(){
+	
+	if (temp_file == NULL)	
+		temp_file = fopen(temp_txt, "r");
+	temp_table = (Table*)malloc(sizeof(*temp_table));
+	init_table(temp_table, 0);
+	temp_table -> table_name = "temp";
+	setSource(temp_file);
+	create_column(temp_table);
+	//ergodic_col(temp_table);
+	fill_data(temp_table);
+	close_file();
+	return temp_table;
+}
+
+//通过索引找到某表
+Table* getTable(char* tab_name){
+	int i = 0;
+	for (; i < _index; i++) {
+		Table* tmp = tables[i];
+		if (strcmp(tab_name, tmp -> table_name) == 0)
+			return tmp;
+	}
+	return NULL;
+}
+
+//查找失败返回-1,查找成功返回争取的索引值
+int getIndexByTabName(char* tab_name) {
+	int i = 0;
+	for (; i < _index; i++) {
+		Table* tmp = tables[i];
+		if (strcmp(tab_name, tmp -> table_name) == 0)
+			return i;
+	}
+	return -1;
 }
 
 //根据表名查找目标表名是否存在
@@ -189,6 +252,16 @@ int isExistsCol(char* table_name, char* col_name){
 	}
 	//printf("比较情况:index = %d\n", index);
 	return index ;
+}
+
+void write_cols(char* tab_name) {
+	//printf("将要打印的表名%s\n", tab_name);
+	Table* table = getTable(tab_name);
+	int i = 0;
+	for (; i < table -> col_num; i++) {
+		Field field = table -> fields[i];
+		outputResultset(field -> col_name);
+	}
 }
 
 //void main(){

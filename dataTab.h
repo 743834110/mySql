@@ -30,5 +30,12 @@ typedef struct _table{
 void create_table();
 int isExistsTable(char* table_name);
 int isExistsCol(char* table_name,char* col_name);
+Table* new_table();
+Table* getTable(char* tab_name);
+int getIndexByTabName(char* tab_name);
+void write_cols(char* tab_name);
+void outputResultset(char* msg);
+void newLine();
+void close_file();
 
 #endif

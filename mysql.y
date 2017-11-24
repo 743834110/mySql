@@ -17,7 +17,7 @@
 %token SELECT FROM WHERE AS LIKE ESCAPE
 %nonassoc OR
 %nonassoc AND
-%left LE LT GT GE NE
+%nonassoc LE LT GT GE NE
 %%
 
 program:		{printf("mysql> ");}	stmts
@@ -29,7 +29,7 @@ stmts:
 	
 
 stmt:			'\n' 				{printf("mysql> ");}
-	|			stmt_select ';'		{find_data("");}
+	|			stmt_select ';'		{find_data();}
 	|			error '\n'			{yyclearin;printf("mysql> ");}
 	;
 
@@ -54,37 +54,43 @@ column:			ID	{field_push($1, 1, COL);}
 	;
 
 col_alias_part:		
-	|			ID		{field_push(token -> ID, 0, ALIAS);}
-	|			AS ID	{field_push(token -> ID, 0, ALIAS);}
+	|			alias		{field_push(token -> ID, 0, ALIAS);}
+	|			AS alias	{field_push(token -> ID, 0, ALIAS);}
 	;
+	
+alias:
+				ID
+	|			STR
+	;
+
 
 tables:			table				
 	|			tables ',' table	
 	;
 	
 table:			ID {table_push($1, TAB);}
-	|			ID {table_push($1, TAB);} ID {table_push(token -> ID, ALIAS);}
+	|			ID {table_push($1, TAB);} alias {table_push(token -> ID, ALIAS);}
 	;
 
 where_part:		
 	|			WHERE expr
 	;
 
-expr:			ID '=' value
-	|			ID LIKE value ESCAPE '"' ID '"'
-	|			expr AND expr
-	|			expr OR expr
-	|			ID LT value
-	|			ID LE value
-	|			ID GT value
-	|			ID GE value
-	|			ID NE value
+expr:			column '=' value 	{cond_push_token('=',token);}	
+	|			column '=' column	{cond_push_cond('=');}			
+	|			column LIKE value ESCAPE '"' ID '"'
+	|			expr AND expr		{code_binary(AND);}
+	|			expr OR expr		{code_binary(OR);}
+	|			column LT value		{cond_push_token(LT, token);}
+	|			column LE value		{cond_push_token(LE, token);}
+	|			column GT value		{cond_push_token(GT, token);}
+	|			column GE value		{cond_push_token(GE, token);}
+	|			column NE value		{cond_push_token(NE, token);}
 	|			'(' expr ')'
 	;
-		
 
-value:			STR
-	|			NUM
+value:			STR		
+	|			NUM		
 	;
 
 %%

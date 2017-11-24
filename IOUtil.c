@@ -135,6 +135,7 @@ void errExit(char *msg){
 	exit(1);
 }
 
+
 //void main(){
 //	FILE *file = fopen("dirlist.txt", "r");
 //	setSource(file);
