@@ -1,9 +1,11 @@
 
 %{
 	#include <stdio.h>
+	#include <stdlib.h>
 	#include "lex.h"
 	#include "dataSear.h"
 	#include "dataTab.h"
+	#include "extend.h"
 	
 	int yyerror(char* msg);
 %}
@@ -14,7 +16,7 @@
 }
 
 %token <VALUE_NUM>NUM	<VALUE_STRING>ID <VALUE_STRING>STR
-%token SELECT FROM WHERE AS LIKE ESCAPE
+%token SELECT FROM WHERE AS LIKE ESCAPE DESC TABLES SHOW ED CLEAR
 %nonassoc OR
 %nonassoc AND
 %nonassoc LE LT GT GE NE
@@ -28,14 +30,21 @@ stmts:
 	;
 	
 
-stmt:			'\n' 				{printf("mysql> ");}
-	|			stmt_select ';'		{find_data();}
-	|			error '\n'			{yyclearin;printf("mysql> ");}
+stmt:			'\n' 					{/*printf("mysql> ");*/}
+	|			stmt_select ';'			{find_data();}
+	|			SHOW TABLES	delimiter	{show_tables();}
+	|			DESC ID delimiter		{desc($2);}
+	|			ED 						{edit();}
+	|			CLEAR					{system("clear");}
+	|			error '\n'				{yyclearin;printf("mysql> ");}
 	;
 
 
 stmt_select:	SELECT sp columns sp FROM sp tables{col_tab_check();} sp where_part 
 	;
+
+delimiter://空
+	|	';'
 
 sp://分隔符seperator	
 	|			sp '\n'	{printf("    -> ");};
@@ -76,8 +85,7 @@ where_part:
 	|			WHERE expr
 	;
 
-expr:			column '=' value 	{cond_push_token('=',token);}	
-	|			column '=' column	{cond_push_cond('=');}			
+expr:			column '=' value 	{cond_push_token('=',token);}			
 	|			column LIKE value ESCAPE '"' ID '"'
 	|			expr AND expr		{code_binary(AND);}
 	|			expr OR expr		{code_binary(OR);}

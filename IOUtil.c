@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include "IOUtil.h"
@@ -16,7 +17,7 @@ FILE *file = NULL;
 char getChar(){
 	if (pos == buff + BUFLEN ){  //表示缓冲区已经数据已经使用完毕了，需要重新读取文件到缓冲区中 
 		pos = buff;
-		size = fread(buff,1,BUFLEN,file); 	 
+		size = fread(buff,1,BUFLEN,file);
 		if (size != BUFLEN){}
 			//fclose(file);
 	} 
@@ -29,7 +30,7 @@ char getChar(){
 		lastChar = *pos ;
 		return *pos++;	
 	}
-	 
+	// printf("size:%d", size);
 	return EOF;  // 文件数据读完，将返回-1 
 }
 //将已读字符退回到缓冲区中 

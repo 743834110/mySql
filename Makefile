@@ -1,4 +1,4 @@
-OBJS = dataTab.o IOUtil.o dataSear.o mysql.tab.o lex.o result.o
+OBJS = dataTab.o IOUtil.o dataSear.o mysql.tab.o lex.o result.o extend.o
 
 test: $(OBJS)
 	gcc -o test $(OBJS)
@@ -20,6 +20,9 @@ result.o: result.h result.c
 
 dataSear.o:	dataSear.h dataSear.c
 	gcc -c dataSear.c
+
+extend.o: extend.h extend.c
+	gcc -c extend.c
 
 clean:
 	rm -r *.o test

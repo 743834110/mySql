@@ -18,6 +18,9 @@ typedef struct{
 extern int LINENUM; 
 extern int COLNUM;
 
+//0:stdin, 1:file, 2:plain (需要设源)
+int input_source = 0;
+
 // 用于检查是否为关键字的关键字到sym映射库，减少多重判断 
 Keyword keywords[] = {
 	{"select", SELECT},
@@ -28,9 +31,28 @@ Keyword keywords[] = {
 	{"escape", ESCAPE},
 	{"or", OR},
 	{"and", AND},
+	{"show",SHOW},
+	{"tables", TABLES},
+	{"desc", DESC},
+	{"ed", ED},
+	{"clear", CLEAR},
 	{"NULL", 0} 	
 };
 
+static int getCh(){
+	if (input_source == 0)
+		return getchar();
+	else{
+		return getChar();
+	}
+}
+
+static void ungetCh(int ch){
+	if (input_source == 0)
+		ungetc(ch, stdin);
+	else
+		ungetChar();
+}
 
 int keyword_lookup(char *ID){
 	Keyword *p = keywords;
@@ -48,13 +70,13 @@ Token newToken(char *ID,int sym){
 
 
 int yylex(){
-
+	
 //	Token token = NULL;	//用的是全局变量token 
 	int ch, ch2;  // ch2用于双字节运算符的判断 
-	ch = getchar();
+	ch = getCh();
 	while(ch == '\t' || ch == '\x20'){
 		// 暂时不统计行号和列号 
-		ch = getchar();
+		ch = getCh();
 	}
 	// 暂时不考虑下划线开头的标识符 ：以及字符数越界等问题 
 	char buf[BUFLEN];
@@ -64,9 +86,9 @@ int yylex(){
 		do{
 			*p++ = ch; 
 		
-		} while((isalnum((ch = getchar())) || ch == '_' || ch&0x80) && ch != EOF);
+		} while((isalnum((ch = getCh())) || ch == '_' || ch&0x80) && ch != EOF);
 		*p = '\0';
-		ungetc(ch, stdin);  // 回退字符串到输入流中 
+		ungetCh(ch);  // 回退字符串到输入流中 
 		int sym = keyword_lookup(buf); 
 		token = sym == 0?newToken(buf,ID):newToken(buf,sym); 
 		//新加的面对ID被跳过的解决方案之一
@@ -76,7 +98,7 @@ int yylex(){
 	}
 	//检测返回带“‘号内的内容
 	else if (ch == '"'){
-		while ((ch = getchar()) != '"' && ch != EOF && ch != ';' && ch != '\n')
+		while ((ch = getCh()) != '"' && ch != EOF && ch != ';' && ch != '\n')
 			*p++ = ch;
 		//正常结束时
 		if (ch == '"'){
@@ -89,7 +111,7 @@ int yylex(){
 		}
 	}
 	else if (isdigit(ch)){
-		ungetc(ch, stdin); 
+		ungetCh(ch); 
 		double integer;
 		// 为了兼容性，应该使用fsanf :return 读入参数的个数 
 		//***已经不兼容   fscanf(file,"%d",&integer);
@@ -104,38 +126,41 @@ int yylex(){
 	else	
 		switch(ch){
 			case '<':{
-				ch2 = getchar();
+				ch2 = getCh();
 				if (ch2 == '=') 
 					token = newToken("<=",LE);
 				else{
-					ungetc(ch2, stdin);
+					ungetCh(ch2);
 					token = newToken("<",LT);
 				}
 				break;
 			}
 			case '>':{
-				ch2 = getchar();
+				ch2 = getCh();
 				if (ch2 == '=') 
 					token = newToken(">=",GE);  // 大于等于 
 				else{
-					ungetc(ch2, stdin);
+					ungetCh(ch2);
 					token = newToken(">",GT);  // 大于 
 				}
 				break;
 			}
 			case '!':{
-				ch2 = getchar();
+				ch2 = getCh();
 				if (ch2 == '=')
 					token = newToken("!=", NE);
 				else{
-					ungetc(ch2, stdin);
+					ungetCh(ch2);
 					token = newToken("!",'!'); 
 				} 
 				break;
 			}
-			case EOF:
+			case EOF: {
 				token = newToken("",0);
+				input_source = 0;
+				printf("ffffffff");
 				break;
+			}
 			default:{
 				char strs[2] = {ch, 0};
 				token = newToken(strs, ch);
