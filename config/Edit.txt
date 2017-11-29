@@ -1,1 +1,1 @@
-select age, name from income where age > 40 and wage > 8000;
+select income.id "高达立于大地之上" from income;

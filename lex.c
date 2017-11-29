@@ -81,11 +81,11 @@ int yylex(){
 	char buf[BUFLEN];
 	char *p = buf;
 	//支持中文输入:当前字符于0x80的与运算和下一个字符与0x80的运算的结果大于１
-	if (isalpha(ch) || ch&0x80 || ch == '.'){  // 开头为字母的情况
+	if (isalpha(ch) || ch&0x80){  // 开头为字母的情况
 		do{
 			*p++ = ch; 
 		
-		} while((isalnum((ch = getCh())) || ch == '_' || ch&0x80 || ch == '.') && ch != EOF);
+		} while((isalnum((ch = getCh())) || ch == '_' || ch&0x80 ) && ch != EOF);
 		*p = '\0';
 		ungetCh(ch);  // 回退字符串到输入流中 
 		int sym = keyword_lookup(buf); 

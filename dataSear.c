@@ -117,6 +117,7 @@ static int col_to_tab_check(){
 		//当有表前缀时：只进行一次搜索就结束本次循环
 		//当没有表前缀时,按照此循环走
 		char* table_name = col_metas[col_i].tab_name;
+		//printf("table_name:%s\n", table_name);
 		char* col_name = col_metas[col_i].col_name;
 		col_check(table_name, col_name);
 	}
@@ -224,7 +225,6 @@ static Meta newMeta(int sym, char* tab_name,char* col_name){
 
 void field_push(char* name, int status,int category){
 	Meta meta_data;
-	//printf("%s\n", name);
 	
 	if (status == 1){
 		if (category == COL){
