@@ -147,7 +147,8 @@ void create_table(){
 	
 	init();	//载入config.ini,填充表名,打开文件,读取内容。
 	printf("共有%d张表:\n", _index);
-	for (int i = 0; i < _index; i++){
+	int i;
+	for (i = 0; i < _index; i++){
 		
 		tables[i] = (Table*)malloc(sizeof(*tables[i]));
 		init_table(tables[i], i);

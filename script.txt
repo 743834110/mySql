@@ -1,1 +1,0 @@
-select age as sunglass, name from table table where (age >= 5 and name = "fdf");
