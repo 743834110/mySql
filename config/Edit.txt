@@ -1,1 +1,1 @@
-select * from income;
+select age, name from income where age > 40 and wage > 8000;

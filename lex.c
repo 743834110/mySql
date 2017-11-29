@@ -113,8 +113,8 @@ int yylex(){
 		ungetCh(ch); 
 		double integer;
 		// 为了兼容性，应该使用fsanf :return 读入参数的个数 
-		//***已经不兼容   fscanf(file,"%d",&integer);
-		scanf("%lf", &integer);
+		fscanf(input_file,"%lf",&integer);
+		//scanf("%lf", &integer);
 		//格式化数据，并写入到字符串当中 
 		sprintf(buf,"%G",integer);
 		token = newToken(buf,NUM); 
@@ -160,11 +160,14 @@ int yylex(){
 				break;
 			}
 			default:{
+				if (ch == ';') {
+					input_file = stdin;
+				}
 				char strs[2] = {ch, 0};
 				token = newToken(strs, ch);
 			}
 		}
-	//printf("%d\n", token -> sym);
+	//printf("%s\n", token -> ID);
 	return token->sym;
 }
 

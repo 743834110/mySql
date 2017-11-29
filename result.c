@@ -55,7 +55,7 @@ void merge(int op) {
 	for (j = 1; j <= medium_row; j++) {
 		if (strcmp(media.table[j][0].value,cmp_symbol) != 0)
 			continue;
-		printf("%d\n", j);
+		//printf("%d\n", j);
 		if (strcmp(medium.table[j][0].value, "$") == 0)
 			media.table[j][0].value = "$";
 		else
@@ -248,11 +248,10 @@ void generateMediumResult() {
 	//数据转换
 	if (!isCopy) {
 		transform();
-		//整理列:的输出顺序
-		outputOrder_index = 0;
-		
 	}
 	//根据tab_metas输出结果集
+	//整理列:的输出顺序
+	outputOrder_index = 0;
 	make_with_one_table();
 	make_column();
 	//根据条件进行相关处理
@@ -260,7 +259,7 @@ void generateMediumResult() {
 	//printf("cond_top = %d\n", cond_top);
 	//printf("-----------n------------\n");
 	make_condition();	
-	output_result();
+	//output_result();
 	//保存旧结果,为新的中间结果申请空间
 	if (!isCopy){
 		memcpy(&media, &medium, sizeof(medium));
@@ -508,6 +507,8 @@ void common_search(){
 		memcpy(&medium, &media, sizeof (media));
 		make_condition();
 	}
+	else //小bug
+		cond_top = 1;
 	//结果输出
 	output_result();
 	clear();
