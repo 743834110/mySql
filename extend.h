@@ -7,5 +7,6 @@ void desc(char* tab_name);
 void show_tables();
 //edit
 void edit();
-
+//@
+void bind_var();
 #endif

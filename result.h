@@ -18,4 +18,6 @@ typedef struct {
 
 void common_search();
 int getTab_nameByAlias(char* alias);
+void generateMediumResult();
+void merge(int op);//两个括号结果的合并
 #endif

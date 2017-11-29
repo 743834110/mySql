@@ -9,6 +9,11 @@
 #define RESULTROWSIZE 1000
 #define RESULTCOLSIZE 1000
 
+static void print();
+static void make_condition();
+static void output_result();
+static void make_with_one_table();
+
 //列栈
 extern Meta col_metas[100];
 extern int col_top ;
@@ -34,12 +39,32 @@ static OutputOrder outputOrder[1000];
 //结果索引数组的长度
 static int outputOrder_index = 0;
 //输出中间结果
-static B_table medium; 
+static B_table medium;
+static B_table media;//中间结果媒介 
+static int isCopy = 0;
 //中间结果的行数和列数
 static int medium_row;
 static int medium_col;
 
-
+//两个中间结果的合并:and就是在合适中找，or就是在不合适中找
+void merge(int op) {
+	if (op == AND)
+		printf("AND");
+	int i, j;
+	char* cmp_symbol = op == AND?"$":"$$";
+	for (j = 1; j <= medium_row; j++) {
+		if (strcmp(media.table[j][0].value,cmp_symbol) != 0)
+			continue;
+		printf("%d\n", j);
+		if (strcmp(medium.table[j][0].value, "$") == 0)
+			media.table[j][0].value = "$";
+		else
+			media.table[j][0].value = "$$";
+	}
+	//保存中间结果
+	memcpy(&medium, &media, sizeof(media));
+	
+}
 
 //通过表的别名找到真名所在的索引
 int getTab_nameByAlias(char* alias) {
@@ -106,8 +131,10 @@ static void transform() {
 	//}
 	
 }
+//清空本次结果
 static void clear() {
 	outputOrder_index = 0;
+	isCopy = 0;
 }
 
 //整理列将要输出的顺序
@@ -144,6 +171,8 @@ static void make_column() {
 						char* col_name = field -> col_name;
 						sprintf(buf, "%s.%s", tab_name, col_name);
 						outputOrder[outputOrder_index].key = strdup(buf);
+						//???????以前没有加
+						//outputOrder[outputOrder_index].num = col + 1;
 						//printf("%s\n", buf);
 						//处理*号列的列名
 						outputOrder[outputOrder_index++].alias = col_name;						
@@ -201,28 +230,58 @@ static void make_with_one_table() {
 				sprintf(buf, "%s.%s", tab_name, col_name);
 				medium.table[row][col].value = strdup(buf);
 			}
-			else 
-				medium.table[row][col] = b_table.table[row][col]; 
+			else {
+				medium.table[row][col] = b_table.table[row][col];
+			} 
 		}
 	}
 	//为中间结果的显示赋予明显的界限
 	medium_row = table -> row_num;
 	medium_col = table -> col_num;
 	//printf("%d:%d\n",medium_row, medium_col);
+}
+
+void generateMediumResult() {
+	
+	//printf("cond_top:%d\n", cond_top);
+
+	//数据转换
+	if (!isCopy) {
+		transform();
+		//整理列:的输出顺序
+		outputOrder_index = 0;
+		
+	}
+	//根据tab_metas输出结果集
+	make_with_one_table();
+	make_column();
+	//根据条件进行相关处理
+	//printf("-----------n------------\n");
+	//printf("cond_top = %d\n", cond_top);
+	//printf("-----------n------------\n");
+	make_condition();	
+	output_result();
+	//保存旧结果,为新的中间结果申请空间
+	if (!isCopy){
+		memcpy(&media, &medium, sizeof(medium));
+		isCopy = 1;
+	}
+	
+	cond_top = 0;
+}
+
+static void make_with_tables() {
 	
 }
-static void make_with_tables() {
 
-}
-
-static void make_result() {
-	int i = 0;
+//static void make_result() {
+//	int i = 0;
 	//大于2的采用另一种表的构造方式
-	if (tab_top >= 2)
-		make_with_tables();
-	else
-		make_with_one_table();
-}
+//	if (tab_top >= 2)
+//		make_with_tables();
+//	else
+//		make_with_one_table();
+//}
 
 static int getIndexInMedium(char* buf) {
 	int col = 1;
@@ -434,25 +493,24 @@ static void output_result() {
 		printf("\n");
 	}
 	printf("\n    -----------------------------------------\n");
-	
 }
 
 //结果输出调用函数:利用表达式栈，表栈，列栈
 void common_search(){
-	//数据转换
-	transform();
-	//清空上一次结果
-	clear();
-	//根据tab_metas输出结果集
-	make_result();
-	//整理列:的输出顺序
-	make_column();
-	//根据条件进行相关处理
-	make_condition();
-	
+	if (isCopy == 0) {
+		transform();
+		make_with_one_table();	
+		make_column();	
+	}
+	if (isCopy == 0)
+		make_condition();
+	else if (cond_top == 2) {
+		memcpy(&medium, &media, sizeof (media));
+		make_condition();
+	}
 	//结果输出
 	output_result();
-	
+	clear();
 	
 }
 

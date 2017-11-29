@@ -6,6 +6,7 @@
 	#include "dataSear.h"
 	#include "dataTab.h"
 	#include "extend.h"
+	#include "result.h"
 	
 	int yyerror(char* msg);
 %}
@@ -30,11 +31,12 @@ stmts:
 	;
 	
 
-stmt:			'\n' 					{/*printf("mysql> ");*/}
+stmt:			'\n' 					{printf("mysql> ");}
 	|			stmt_select ';'			{find_data();}
 	|			SHOW TABLES	delimiter	{show_tables();}
 	|			DESC ID delimiter		{desc($2);}
-	|			ED 						{edit();}
+	|			ED						{edit();}
+	|			'@'						{bind_var();}
 	|			CLEAR					{system("clear");}
 	|			error '\n'				{yyclearin;printf("mysql> ");}
 	;
@@ -94,7 +96,7 @@ expr:			column '=' value 	{cond_push_token('=',token);}
 	|			column GT value		{cond_push_token(GT, token);}
 	|			column GE value		{cond_push_token(GE, token);}
 	|			column NE value		{cond_push_token(NE, token);}
-	|			'(' expr ')'
+	|			'(' expr ')'		{generateMediumResult();}
 	;
 
 value:			STR		

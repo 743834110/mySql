@@ -18,6 +18,8 @@
 //表达式栈
  Cond conds[100];
  int cond_top = 0;
+ //是否碰到连续的逻辑运算符
+ int continue_meets_with_logic= 0;
 
 //0表示所写的语句误,无结果输出,1表示有输出
 static int showResult = 1;
@@ -128,6 +130,12 @@ void code_binary(int sym){
 	Cond cond2 = conds[--cond_top];
 	conds[cond_top++] = cond;
 	conds[cond_top++] = cond2;
+	if (continue_meets_with_logic == 1){
+		//两次碰到中间结果则进行中间结果的处理：结果的合并
+		merge(sym);
+	}
+	/*计算出中间结果是可能会产生错误*/
+	continue_meets_with_logic = 1;
 	
 }
 
@@ -139,9 +147,9 @@ void cond_push_token (int op, Token token) {
 	
 	Meta meta = col_metas[--col_top];
 	//printf("key:%s.%s\n", meta.tab_name, meta.col_name);
-	printf("op:%d\n", op);
-	printf("showResult:%d\n", showResult);
-	printf("col_top:%d\n", col_top);
+	//printf("op:%d\n", op);
+	//printf("showResult:%d\n", showResult);
+	//printf("col_top:%d\n", col_top);
 	//printf("value:%s\n", token -> ID);
 	//检查meta信息的合法性
 	char* tab_name  = meta.tab_name;
@@ -155,6 +163,8 @@ void cond_push_token (int op, Token token) {
 	cond.meta = meta;
 	cond._meta = NULL;
 	conds[cond_top++] = cond;
+	/*作为是否处理中间结果的一个度量*/
+	continue_meets_with_logic = 0;
 }
 
 //自然、不等连接用

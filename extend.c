@@ -12,7 +12,7 @@
 extern Table *tables[100];
 extern int _index;
 //设置终端输入源
-extern int input_source;
+extern FILE* input_file;
 
 void desc(char* tab_name){
 	if (!isExistsTable(tab_name)) 
@@ -44,9 +44,11 @@ void show_tables(){
 }
 
 void edit() {
-	int status;//status为回传值
-	setSource(fopen("Edit.txt", "r"));
-	input_source = 1;
-	
+	system("gedit config/Edit.txt");
+}
+
+void bind_var() {
+	input_file = fopen("config/Edit.txt", "r");
+	printf("Edit.txt中代码执行情况如下：\n");
 }
 

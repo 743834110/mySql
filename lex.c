@@ -18,12 +18,12 @@ typedef struct{
 extern int LINENUM; 
 extern int COLNUM;
 
-//0:stdin, 1:file, 2:plain (需要设源)
-int input_source = 0;
+FILE* input_file = NULL;
 
 // 用于检查是否为关键字的关键字到sym映射库，减少多重判断 
 Keyword keywords[] = {
 	{"select", SELECT},
+	
 	{"from", FROM},
 	{"where", WHERE},
 	{"as", AS},
@@ -40,18 +40,13 @@ Keyword keywords[] = {
 };
 
 static int getCh(){
-	if (input_source == 0)
-		return getchar();
-	else{
-		return getChar();
-	}
+	if (input_file == NULL)
+		input_file = stdin;
+	return getc(input_file);
 }
 
 static void ungetCh(int ch){
-	if (input_source == 0)
-		ungetc(ch, stdin);
-	else
-		ungetChar();
+	ungetc(ch, input_file);
 }
 
 int keyword_lookup(char *ID){
@@ -78,15 +73,19 @@ int yylex(){
 		// 暂时不统计行号和列号 
 		ch = getCh();
 	}
+	if (ch == -1){
+		input_file = stdin;
+		yylex();
+	}
 	// 暂时不考虑下划线开头的标识符 ：以及字符数越界等问题 
 	char buf[BUFLEN];
 	char *p = buf;
 	//支持中文输入:当前字符于0x80的与运算和下一个字符与0x80的运算的结果大于１
-	if (isalpha(ch) || ch&0x80){  // 开头为字母的情况
+	if (isalpha(ch) || ch&0x80 || ch == '.'){  // 开头为字母的情况
 		do{
 			*p++ = ch; 
 		
-		} while((isalnum((ch = getCh())) || ch == '_' || ch&0x80) && ch != EOF);
+		} while((isalnum((ch = getCh())) || ch == '_' || ch&0x80 || ch == '.') && ch != EOF);
 		*p = '\0';
 		ungetCh(ch);  // 回退字符串到输入流中 
 		int sym = keyword_lookup(buf); 
@@ -156,9 +155,8 @@ int yylex(){
 				break;
 			}
 			case EOF: {
+				
 				token = newToken("",0);
-				input_source = 0;
-				printf("ffffffff");
 				break;
 			}
 			default:{

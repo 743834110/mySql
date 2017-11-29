@@ -74,7 +74,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "mysql.y" /* yacc.c:1909  */
+#line 14 "mysql.y" /* yacc.c:1909  */
 
 	double 	VALUE_NUM;
 	char* 	VALUE_STRING;
