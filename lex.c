@@ -36,6 +36,9 @@ Keyword keywords[] = {
 	{"desc", DESC},
 	{"ed", ED},
 	{"clear", CLEAR},
+	{"logout", LOGOUT},
+	{"update", UPDATE},
+	{"set", SET},
 	{"NULL", 0} 	
 };
 

@@ -1,1 +1,1 @@
-select income.id "高达立于大地之上" from income;
+update income set id = 4 where job = "教师" and (age < 30 or age > 40);

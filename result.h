@@ -16,6 +16,8 @@ typedef struct {
 	char* alias;
 }OutputOrder;
 
+void clear();
+void pre_do();
 void common_search();
 int getTab_nameByAlias(char* alias);
 void generateMediumResult();

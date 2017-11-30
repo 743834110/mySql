@@ -59,13 +59,16 @@ extern int yydebug;
     SHOW = 269,
     ED = 270,
     CLEAR = 271,
-    OR = 272,
-    AND = 273,
-    LE = 274,
-    LT = 275,
-    GT = 276,
-    GE = 277,
-    NE = 278
+    LOGOUT = 272,
+    UPDATE = 273,
+    SET = 274,
+    OR = 275,
+    AND = 276,
+    LE = 277,
+    LT = 278,
+    GT = 279,
+    GE = 280,
+    NE = 281
   };
 #endif
 
@@ -74,12 +77,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 14 "mysql.y" /* yacc.c:1909  */
+#line 15 "mysql.y" /* yacc.c:1909  */
 
 	double 	VALUE_NUM;
 	char* 	VALUE_STRING;
+	Token TOKEN;
 
-#line 83 "mysql.tab.h" /* yacc.c:1909  */
+#line 87 "mysql.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

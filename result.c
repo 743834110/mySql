@@ -39,17 +39,17 @@ static OutputOrder outputOrder[1000];
 //结果索引数组的长度
 static int outputOrder_index = 0;
 //输出中间结果
-static B_table medium;
+B_table medium;
 static B_table media;//中间结果媒介 
 static int isCopy = 0;
 //中间结果的行数和列数
-static int medium_row;
-static int medium_col;
+int medium_row;
+int medium_col;
 
 //两个中间结果的合并:and就是在合适中找，or就是在不合适中找
 void merge(int op) {
-	if (op == AND)
-		printf("AND");
+	//if (op == AND)
+		//printf("AND");
 	int i, j;
 	char* cmp_symbol = op == AND?"$":"$$";
 	for (j = 1; j <= medium_row; j++) {
@@ -80,6 +80,7 @@ int getTab_nameByAlias(char* alias) {
 char* getTableNameByCol(char* col_name) {
 	int i = 0;
 	for (; i < tab_top; i++) {
+		
 		Table* table = getTable(tab_metas[i].tab_name);
 		int col = 0;
 		for (; col < table -> col_num; col++) {
@@ -132,7 +133,7 @@ static void transform() {
 	
 }
 //清空本次结果
-static void clear() {
+void clear() {
 	outputOrder_index = 0;
 	isCopy = 0;
 }
@@ -244,7 +245,8 @@ static void make_with_one_table() {
 void generateMediumResult() {
 	
 	//printf("cond_top:%d\n", cond_top);
-
+	Cond tmp[10];//最多存10个临时条件
+	int change = 0;
 	//数据转换
 	if (!isCopy) {
 		transform();
@@ -258,6 +260,17 @@ void generateMediumResult() {
 	//printf("-----------n------------\n");
 	//printf("cond_top = %d\n", cond_top);
 	//printf("-----------n------------\n");
+	//select* from income where (age>40 or age<30) and (job = "教师");
+	//cond_top > 3的要进行元素的切换。
+	if (cond_top > 3) {
+		int i;
+		change = cond_top - 3;//要切换的元素的位置
+		for (i = 0; i < change; i++)
+			tmp[i] = conds[i];
+		for (i = change; i < cond_top; i++) 
+			conds[i - change] = conds[i];
+		cond_top = cond_top - change;
+	}
 	make_condition();	
 	//output_result();
 	//保存旧结果,为新的中间结果申请空间
@@ -265,8 +278,15 @@ void generateMediumResult() {
 		memcpy(&media, &medium, sizeof(medium));
 		isCopy = 1;
 	}
-	
-	cond_top = 0;
+	//调整被运算条件的位置
+	if (change == 0)
+		cond_top = 0;
+	else {
+		int i ;
+		for (i = 0;i < change; i++)
+			conds[i] = tmp[i];
+		cond_top = change;
+	}
 }
 
 static void make_with_tables() {
@@ -478,6 +498,7 @@ static void output_result() {
 		printf("\t%-5s", outputOrder[i].alias);
 	printf("\n    -----------------------------------------\n");
 	//数据
+	int count = 0;//统计
 	for (; row <= medium_row; row++) {
 		int index;
 		//printf("cond_top = %d\n", cond_top);
@@ -485,17 +506,20 @@ static void output_result() {
 			continue;
 		else if (cond_top != 0 && strcmp(medium.table[row][0].value, "$$") == 0)
 			continue;
+		count++;
 		for (index = 0; index < outputOrder_index; index++) {
 			int temp = outputOrder[index].num;
 			printf("\t%-5s", medium.table[row][temp].value);
 		}
 		printf("\n");
 	}
-	printf("\n    -----------------------------------------\n");
+	
+	printf("\n                                  共查询到%d条记录\n", count);
+	printf("    -----------------------------------------\n");
 }
 
-//结果输出调用函数:利用表达式栈，表栈，列栈
-void common_search(){
+void pre_do(){
+	//printf("fff");
 	if (isCopy == 0) {
 		transform();
 		make_with_one_table();	
@@ -509,9 +533,14 @@ void common_search(){
 	}
 	else //小bug
 		cond_top = 1;
+}
+
+//结果输出调用函数:利用表达式栈，表栈，列栈
+void common_search(){
+	//结果预处理
+	pre_do();
 	//结果输出
 	output_result();
 	clear();
-	
 }
 

@@ -7,6 +7,7 @@
 	#include "dataTab.h"
 	#include "extend.h"
 	#include "result.h"
+	#include "dataUpd.h"
 	
 	int yyerror(char* msg);
 %}
@@ -14,10 +15,12 @@
 %union{
 	double 	VALUE_NUM;
 	char* 	VALUE_STRING;
+	Token TOKEN;
 }
 
+%type <TOKEN> value
 %token <VALUE_NUM>NUM	<VALUE_STRING>ID <VALUE_STRING>STR
-%token SELECT FROM WHERE AS LIKE ESCAPE DESC TABLES SHOW ED CLEAR
+%token SELECT FROM WHERE AS LIKE ESCAPE DESC TABLES SHOW ED CLEAR LOGOUT UPDATE SET 
 %nonassoc OR
 %nonassoc AND
 %nonassoc LE LT GT GE NE
@@ -33,14 +36,18 @@ stmts:
 
 stmt:			'\n' 					{printf("mysql> ");}
 	|			stmt_select ';'			{find_data();}
+	|			stmt_update ';'			{}
 	|			SHOW TABLES	delimiter	{show_tables();}
 	|			DESC ID delimiter		{desc($2);}
 	|			ED						{edit();}
 	|			'@'						{bind_var();}
 	|			CLEAR					{system("clear");}
+	|			LOGOUT					{printf("退出成功\n");exit(0);}
 	|			error '\n'				{yyclearin;printf("mysql> ");}
 	;
 
+stmt_update:	UPDATE table SET ID '=' value where_part	{update($4, $6);}
+	;
 
 stmt_select:	SELECT sp columns sp FROM sp tables{col_tab_check();} sp where_part 
 	;
@@ -99,8 +106,8 @@ expr:			column '=' value 	{cond_push_token('=',token);}
 	|			'(' expr ')'		{generateMediumResult();}
 	;
 
-value:			STR		
-	|			NUM		
+value:			STR		{$$ = token;}
+	|			NUM		{$$ = token;}
 	;
 
 %%

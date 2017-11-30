@@ -211,6 +211,26 @@ Table* getTable(char* tab_name){
 	}
 	return NULL;
 }
+//通过某表查找某段
+Field getField(Table* table, char* col_name){
+	int i = 0;
+	for (; i < _index; i++) {
+		Field field = table -> fields[i];
+		if (strcmp(field -> col_name, col_name) == 0)
+			return field;
+	}
+	return NULL;
+}
+//更新某段某行的信息:这里可能会越界
+void update_field_by_row(int row, Field field,char* val) {
+	int i = 0;
+	Value* value = field -> data;
+	for (; i < row; i++)
+		value = value -> next;
+	free(value -> value);
+	value -> value = strdup(val);
+}
+
 
 //查找失败返回-1,查找成功返回争取的索引值
 int getIndexByTabName(char* tab_name) {

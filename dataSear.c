@@ -22,7 +22,7 @@
  int continue_meets_with_logic= 0;
 
 //0表示所写的语句误,无结果输出,1表示有输出
-static int showResult = 1;
+int showResult = 1;
 
 //检查表名是否存在:初步检查,确保表的正确存在性
 static int tab_check(char* tab_name,char* alias) {
@@ -131,12 +131,12 @@ void code_binary(int sym){
 	Cond cond2 = conds[--cond_top];
 	conds[cond_top++] = cond;
 	conds[cond_top++] = cond2;
-	if (continue_meets_with_logic == 1){
+	if (continue_meets_with_logic >= 1){
 		//两次碰到中间结果则进行中间结果的处理：结果的合并
 		merge(sym);
 	}
 	/*计算出中间结果是可能会产生错误*/
-	continue_meets_with_logic = 1;
+	continue_meets_with_logic = 2;
 	
 }
 
@@ -165,7 +165,7 @@ void cond_push_token (int op, Token token) {
 	cond._meta = NULL;
 	conds[cond_top++] = cond;
 	/*作为是否处理中间结果的一个度量*/
-	continue_meets_with_logic = 0;
+	continue_meets_with_logic = continue_meets_with_logic != 0? continue_meets_with_logic - 1: 0;
 }
 
 //自然、不等连接用

@@ -1,7 +1,7 @@
-OBJS = dataTab.o IOUtil.o dataSear.o mysql.tab.o lex.o result.o extend.o
+OBJS = dataTab.o IOUtil.o dataSear.o mysql.tab.o lex.o result.o extend.o dataUpd.o
 
-mysql: $(OBJS)
-	gcc -o mysql $(OBJS)
+sql: $(OBJS)
+	gcc -o sql $(OBJS)
 
 mysql.tab.c mysql.tab.h: mysql.y
 	bison -d mysql.y
@@ -21,8 +21,11 @@ result.o: result.h result.c
 dataSear.o:	dataSear.h dataSear.c
 	gcc -c dataSear.c
 
+dataUpd.o:	dataUpd.h dataUpd.c
+	gcc -c dataUpd.c
+
 extend.o: extend.h extend.c
 	gcc -c extend.c
 
 clean:
-	rm -r *.o mysql
+	rm -r *.o sql

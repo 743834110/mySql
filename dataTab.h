@@ -32,6 +32,8 @@ int isExistsTable(char* table_name);
 int isExistsCol(char* table_name,char* col_name);
 Table* new_table();
 Table* getTable(char* tab_name);
+Field getField(Table* table, char* col_name);
+void update_field_by_row(int row, Field field,char* val);
 int getIndexByTabName(char* tab_name);
 void write_cols(char* tab_name);
 void outputResultset(char* msg);
