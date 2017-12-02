@@ -1,5 +1,5 @@
-#ifndef DATASEAR_H_
-#define DATASESR_H_
+#ifndef SYMTAB_H_
+#define SYMTAB_H_
 #include "lex.h"
 
 enum {

@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-#include "dataSear.h"
+#include "symtab.h"
 #include "dataTab.h"
-#include "mysql.tab.h"
+#include "sql.tab.h"
 #include "IOUtil.h"
 #include "result.h"
 
@@ -29,7 +29,7 @@ static int tab_check(char* tab_name,char* alias) {
 	int result = 1;
 	if (alias == NULL) {
 		if (!isExistsTable(tab_name)) {
-			fprintf(stderr, "表名%s不可用\n", tab_name);
+			fprintf(stderr, "\n表名%s不可用\n", tab_name);
 			result = 0;
 		}
 	}
@@ -68,7 +68,7 @@ static int col_check(char* tab_name, char* col_name){
 		//找一下列名有没有出现在表名内
 		if (!tab_check (tab_name,"g")) {
 			showResult = 0;
-			printf("所指定的表名在语句当中不合法\n");
+			printf("\n所指定的表名在语句当中不合法\n");
 		}
 		else {
 			int index = getTab_nameByAlias(tab_name);
@@ -79,7 +79,7 @@ static int col_check(char* tab_name, char* col_name){
 				col_repeat_count++;
 			if (col_repeat_count == 0) {
 				showResult = 0;
-				printf("在所指定的列%s在给出的表%s中未出现相关列\n", col_name, tab_name);
+				printf("\n在所指定的列'%s'在给出的表'%s'中未出现相关列\n", col_name, tab_name);
 			}
 			
 		}		
@@ -96,12 +96,12 @@ static int col_check(char* tab_name, char* col_name){
 		//当列名不出现在任何表结构时
 		if (col_repeat_count == 0) {
 			showResult = 0;
-			printf("在所指定的列%s在给出的表中未出现相关列\n", col_name);
+			printf("\n在所指定的列'%s'在给出的表中未出现相关列\n", col_name);
 		}
 		//检查有没有表名字制定	
 		else if (col_repeat_count >=2 ) {
 			showResult = 0;
-			printf("列%s出现在多个表中,请为其指定所属\n", col_name);
+			printf("\n列%s出现在多个表中,请为其指定所属\n", col_name);
 		}
 	}
 	return showResult;
@@ -133,11 +133,10 @@ void code_binary(int sym){
 	conds[cond_top++] = cond2;
 	if (continue_meets_with_logic >= 1){
 		//两次碰到中间结果则进行中间结果的处理：结果的合并
-		merge(sym);
+		merge(sym);//连续碰到逻辑运算符和间隔一个记号碰到逻辑运算符需要进行中间结果的处理
 	}
 	/*计算出中间结果是可能会产生错误*/
-	continue_meets_with_logic = 2;
-	
+	continue_meets_with_logic = 2;	
 }
 
 //表达式进栈_token

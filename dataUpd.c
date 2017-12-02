@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "dataUpd.h"
-#include "dataSear.h"
+#include "symtab.h"
 #include "dataTab.h"
 #include "result.h"
 
@@ -31,9 +31,8 @@ static void update_result(char* col_name, Token token){
 		count++;
 		printf("更新的是第%d行数据\n", row);
 		Field field = getField(table, col_name);
-		//printf("col_name:%s\n", field -> col_name);
 		update_field_by_row(row - 1, field, token -> ID);
-		printf("\n");
+		//printf("\n");
 	}
 	
 	printf("\n                                  共更新到%d条记录\n", count);
@@ -51,8 +50,8 @@ void update( char* col_name, Token token) {
 	else {
 		//根据搜索结果进行结果的更新
 		//printf("%s\n", buf);
-		pre_do();
-		update_result(col_name, token);
+		pre_do();//目标结果集进行预处理
+		update_result(col_name, token);//根据结果集的状态位进行相应的列修改
 	}
 	
 	

@@ -1,1 +1,1 @@
-update income set id = 4 where job = "教师" and (age < 30 or age > 40);
+update income set job = "程序员" where job="教师" and (age < 30 or age > 40);

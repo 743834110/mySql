@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "extend.h"
 #include "dataTab.h"
-#include "dataSear.h"
+#include "symtab.h"
 #include "lex.h"
 #include "IOUtil.h"
 
@@ -20,7 +20,7 @@ void desc(char* tab_name){
 	else {
 		Table* table = getTable(tab_name);
 		int i = 0;
-		printf("    +-------------------\n");
+		printf("\n    +-------------------\n");
 		printf("    |   Field\n");
 		printf("    +-------------------\n");
 		for (i = 0;  i < table -> col_num; i++) {
@@ -33,7 +33,7 @@ void desc(char* tab_name){
 //显示
 void show_tables(){
 	int i = 0;
-	printf("    +--------------------------------------------------+\n");
+	printf("\n    +--------------------------------------------------+\n");
 	printf("    | %15s\t%15s\t%15s|\n", "table_name","col_num", "row_num");
 	printf("    +--------------------------------------------------+\n");
 	for (i = 0; i < _index; i++){
@@ -49,6 +49,6 @@ void edit() {
 
 void bind_var() {
 	input_file = fopen("config/Edit.txt", "r");
-	printf("Edit.txt中代码执行情况如下：\n");
+	printf("\nconfig/Edit.txt中代码执行情况如下：\n");
 }
 

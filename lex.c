@@ -4,9 +4,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include "lex.h"
-#include "mysql.tab.h"
+#include "sql.tab.h"
 #include "IOUtil.h"
-#define BUFLEN 20
+#define BUFLEN 256
 
 Token token;
 
@@ -72,13 +72,20 @@ int yylex(){
 //	Token token = NULL;	//用的是全局变量token 
 	int ch, ch2;  // ch2用于双字节运算符的判断 
 	ch = getCh();
-	while(ch == '\t' || ch == '\x20'){
+	while(ch == '\t' || ch == '\x20' ){
 		// 暂时不统计行号和列号 
+		
 		ch = getCh();
 	}
 	if (ch == -1){
-		input_file = stdin;
-		yylex();
+		if (input_file != stdin){
+			input_file = stdin;
+			return '\r';
+		}
+		else{
+			
+			return 0;
+		}
 	}
 	// 暂时不考虑下划线开头的标识符 ：以及字符数越界等问题 
 	char buf[BUFLEN];
@@ -158,19 +165,19 @@ int yylex(){
 				break;
 			}
 			case EOF: {
-				
 				token = newToken("",0);
 				break;
 			}
 			default:{
-				if (ch == ';') {
-					input_file = stdin;
-				}
+				//if (ch == ';') {
+					//input_file = stdin;
+				//}
 				char strs[2] = {ch, 0};
 				token = newToken(strs, ch);
 			}
 		}
-	//printf("%s\n", token -> ID);
+	//printf("%d\n", token -> sym);
+	
 	return token->sym;
 }
 

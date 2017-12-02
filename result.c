@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include "result.h"
 #include "dataTab.h"
-#include "dataSear.h"
-#include "mysql.tab.h"
+#include "symtab.h"
+#include "sql.tab.h"
 #define RESULTROWSIZE 1000
 #define RESULTCOLSIZE 1000
 
@@ -494,6 +494,7 @@ static void make_condition() {
 static void output_result() {
 	int row = 1,i;
 	//输出表头
+	printf("\n");
 	for (i = 0; i < outputOrder_index; i++) 
 		printf("\t%-5s", outputOrder[i].alias);
 	printf("\n    -----------------------------------------\n");

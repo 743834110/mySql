@@ -151,14 +151,14 @@ void create_table(){
 	for (i = 0; i < _index; i++){
 		
 		tables[i] = (Table*)malloc(sizeof(*tables[i]));
-		init_table(tables[i], i);
-		setSource(table_files[i]);
+		init_table(tables[i], i);//初始化表结构
+		setSource(table_files[i]);//设置将要读取文件源
 		printf("\t表名：%s\n", tables[i]->table_name);
-		create_column(tables[i]);
+		create_column(tables[i]);//根据文件源建立表结构
 		printf("\t\t构建%s表结构成功.\n", tables[i] -> table_name);
-		ergodic_col(tables[i]);
+		ergodic_col(tables[i]);//遍历表结构
 		//开始填充数据表数据
-		fill_data(tables[i]);
+		fill_data(tables[i]);//根据文件源对该数据结构进行数据填充
 		printf("\t\t填充%s表数据成功\n", tables[i] -> table_name);
 	}
 }
@@ -213,9 +213,11 @@ Table* getTable(char* tab_name){
 }
 //通过某表查找某段
 Field getField(Table* table, char* col_name){
+
 	int i = 0;
-	for (; i < _index; i++) {
+	for (i = 0; i < table -> col_num; i++) {
 		Field field = table -> fields[i];
+		//printf("%s == %s\n", field -> col_name, col_name);
 		if (strcmp(field -> col_name, col_name) == 0)
 			return field;
 	}
@@ -223,6 +225,7 @@ Field getField(Table* table, char* col_name){
 }
 //更新某段某行的信息:这里可能会越界
 void update_field_by_row(int row, Field field,char* val) {
+
 	int i = 0;
 	Value* value = field -> data;
 	for (; i < row; i++)

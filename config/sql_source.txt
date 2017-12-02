@@ -1,25 +1,67 @@
 select 没有编译原理存在的世界不是我想要的世界 from income;
+
 select b.id from income, income;
+
 select id from income, income;
+
 select a.id from income a;
+
 select id from income;
+
 select word from dictionary;
+
 select word from income;
+
 select * from income;
+
 select id from income, dictionary;
+
 select id from incomes;
+
 select id;
+
 select d.ee from income d;
+
+select job, wage from income;
+
 select * from income where job = "教师";
+
+select name,wage from income where job = "教师";
+
 select * from income where job = "教师" and age > 40;
+
 select * from income where age < 30 or age > 40;
+
 select * from income where (age < 30 or age > 40) and job = "教师";
+
 select * from income where job = "教师"and (age < 30 or age > 40) ;
+
 select * from income where (age < 30 and wage < 6000) or (age > 40 and wage > 8000);
+
 select a.id "教师 ID", a.name 性别, a.age as 年龄, wage as "薪水" from income a;
-desc income;
-desc dictionary
-ed
+
+select * from income;
+update income set wage = 5000;
+select * from income;
+
+select * from income;
+update income set job = "程序员" where job = "教师" ;
+select * from income;
+
+select * from income;
+update income set job = "程序员" where job = "教师" or job = "文员";
+select * from income;
+
+select * from income;
+update income set job = "程序员" where age > 20 and age < 35 ;
+select * from income;
+
+select * from income;
+update income set job = "教授" where job = "教师" and (wage > 8000 or age >= 40 );
+select * from income;
+
+show tables
+
+desc income
+
 @
-
-

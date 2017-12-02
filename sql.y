@@ -3,7 +3,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include "lex.h"
-	#include "dataSear.h"
+	#include "symtab.h"
 	#include "dataTab.h"
 	#include "extend.h"
 	#include "result.h"
@@ -34,16 +34,17 @@ stmts:
 	;
 	
 
-stmt:			'\n' 					{printf("mysql> ");}
-	|			stmt_select ';'			{find_data();}
-	|			stmt_update ';'			{}
-	|			SHOW TABLES	delimiter	{show_tables();}
-	|			DESC ID delimiter		{desc($2);}
-	|			ED						{edit();}
+stmt:			'\r'
+	|			'\n' 					{printf("mysql> ");}
+	|			stmt_select ';'	'\n'	{find_data();}
+	|			stmt_update ';'	'\n'	{}
+	|			SHOW TABLES	'\n'		{show_tables();}
+	|			DESC ID '\n'			{desc($2);}
+	|			ED	'\n'				{edit();}
 	|			'@'						{bind_var();}
-	|			CLEAR					{system("clear");}
-	|			LOGOUT					{printf("退出成功\n");exit(0);}
-	|			error '\n'				{yyclearin;printf("mysql> ");}
+	|			CLEAR 					{system("clear");}
+	|			LOGOUT '\n'				{printf("退出成功\n");exit(0);}
+	|			error '\n'				{yyerrok;printf("mysql> ");}
 	;
 
 stmt_update:	UPDATE table SET ID '=' value where_part	{update($4, $6);}
@@ -51,9 +52,6 @@ stmt_update:	UPDATE table SET ID '=' value where_part	{update($4, $6);}
 
 stmt_select:	SELECT sp columns sp FROM sp tables{col_tab_check();} sp where_part 
 	;
-
-delimiter://空
-	|	';'
 
 sp://分隔符seperator	
 	|			sp '\n'	{printf("    -> ");};
