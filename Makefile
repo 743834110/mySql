@@ -1,7 +1,7 @@
 OBJS = sql.tab.o dataTab.o IOUtil.o symtab.o lex.o result.o extend.o dataUpd.o dataIns.o
 
 sql: $(OBJS)
-	gcc -o sql $(OBJS)
+	gcc -o sql $(OBJS)  & ./config/build_sql.sh config/sql_source.txt
 
 sql.tab.c sql.tab.h: sql.y
 	bison -d sql.y
