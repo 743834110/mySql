@@ -288,6 +288,16 @@ void write_cols(char* tab_name) {
 	}
 }
 
+void insert_value_in_field(Field field,char* col_value) {
+
+	Value* p = (Value*)malloc(sizeof(*p));
+	p -> next = NULL;
+	p -> value = strdup(col_value);
+	//后插法
+	field -> R -> next = p;
+	field -> R = p;
+}
+
 //void main(){
 //	create_table();
 //}

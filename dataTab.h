@@ -34,6 +34,7 @@ Table* new_table();
 Table* getTable(char* tab_name);
 Field getField(Table* table, char* col_name);
 void update_field_by_row(int row, Field field,char* val);
+void insert_value_in_field(Field field,char* col_value);
 int getIndexByTabName(char* tab_name);
 void write_cols(char* tab_name);
 void outputResultset(char* msg);

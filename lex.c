@@ -23,7 +23,6 @@ FILE* input_file = NULL;
 // 用于检查是否为关键字的关键字到sym映射库，减少多重判断 
 Keyword keywords[] = {
 	{"select", SELECT},
-	
 	{"from", FROM},
 	{"where", WHERE},
 	{"as", AS},
@@ -39,6 +38,9 @@ Keyword keywords[] = {
 	{"logout", LOGOUT},
 	{"update", UPDATE},
 	{"set", SET},
+	{"insert", INSERT},
+	{"into",INTO},
+	{"values", VALUES},
 	{"NULL", 0} 	
 };
 

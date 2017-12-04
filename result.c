@@ -94,9 +94,9 @@ char* getTableNameByCol(char* col_name) {
 
 //只是转换一次
 static void transform() {
-	if (isTrans == 1)
-		return ;
-	isTrans = 1;
+	//if (isTrans == 1)
+		//return ;
+	//isTrans = 1;
 	int i = 0;
 	for (; i < _index; i++) {
 		Table* table = tables[i];
@@ -521,11 +521,11 @@ static void output_result() {
 
 void pre_do(){
 	//printf("fff");
-	if (isCopy == 0) {
+	//if (isCopy == 0) {
 		transform();
 		make_with_one_table();	
 		make_column();	
-	}
+	//}
 	if (isCopy == 0)
 		make_condition();
 	else if (cond_top == 2) {

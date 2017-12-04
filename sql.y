@@ -8,6 +8,7 @@
 	#include "extend.h"
 	#include "result.h"
 	#include "dataUpd.h"
+	#include "dataIns.h"
 	
 	int yyerror(char* msg);
 %}
@@ -20,7 +21,7 @@
 
 %type <TOKEN> value
 %token <VALUE_NUM>NUM	<VALUE_STRING>ID <VALUE_STRING>STR
-%token SELECT FROM WHERE AS LIKE ESCAPE DESC TABLES SHOW ED CLEAR LOGOUT UPDATE SET 
+%token SELECT FROM WHERE AS LIKE ESCAPE DESC TABLES SHOW ED CLEAR LOGOUT UPDATE SET INSERT INTO VALUES
 %nonassoc OR
 %nonassoc AND
 %nonassoc LE LT GT GE NE
@@ -38,6 +39,7 @@ stmt:			'\r'
 	|			'\n' 					{printf("mysql> ");}
 	|			stmt_select ';'	'\n'	{find_data();}
 	|			stmt_update ';'	'\n'	{}
+	|			stmt_insert ';'	'\n'	{clear_of_dataIns();}
 	|			SHOW TABLES	'\n'		{show_tables();}
 	|			DESC ID '\n'			{desc($2);}
 	|			ED	'\n'				{edit();}
@@ -47,6 +49,21 @@ stmt:			'\r'
 	|			error '\n'				{yyerrok;printf("mysql> ");}
 	;
 
+stmt_insert:	INSERT INTO insert_part values_part
+	;
+	
+values_part:	VALUES '('values ')'					{insert();}
+	|			values_part ',' VALUES '('values ')'	{insert();}
+	;
+
+values:			value					{add_token($1);}
+	|			values ',' value		{add_token($3);}
+	;
+
+insert_part:	table
+	|			table '(' _columns ')'	{col_tab_check();}
+	;
+	
 stmt_update:	UPDATE table SET ID '=' value where_part	{update($4, $6);}
 	;
 
@@ -106,6 +123,7 @@ expr:			column '=' value 	{cond_push_token('=',token);}
 
 value:			STR		{$$ = token;}
 	|			NUM		{$$ = token;}
+	|			ID		{$$ = token;}
 	;
 
 %%
